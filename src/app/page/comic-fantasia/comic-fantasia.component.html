@@ -1,0 +1,14 @@
+<div class="row py-3 px-4">
+  <div class="col-12 py-3 text-center">
+    <h1>Catalogo de Libros</h1>
+  </div>
+
+  <div class="col-4 py-3" *ngFor="let item of Books">
+    <app-cards
+      [author]="item.author"
+      [title]="item.title"
+      [CiteBook]="item.description"
+      [UrlImg]="item.urlImg"
+    ></app-cards>
+  </div>
+</div>

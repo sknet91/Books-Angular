@@ -1,0 +1,43 @@
+<div class="row py-5 px-4">
+  <div class="col-xl-10 col-md-10 col-sm-12 mx-auto">
+    <div class="bg-white shadow rounded overflow-hidden">
+      <div class="px-4 pt-0 bg-info">
+        <div class="media align-items-end profile-header">
+          <div class="profile mr-3 py-3">
+            <img
+              src="{{profilePic}}"
+              alt="..."
+              width="130"
+              class="rounded mb-2 img-thumbnail"
+            /><a routerLink="/editProfile" class="btn btn-dark btn-sm btn-block">Edit profile</a>
+          </div>
+          <div class="media-body mb-5 text-white">
+            <h4 class="mt-0 mb-0">{{name}} {{lastname}}</h4>
+            <p class="small mb-4">
+              <i class="fa fa-map-marker mr-2"></i>Medellin
+            </p>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="py-4 px-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="mb-0">Libros Recientes</h5>
+          <a href="#" class="btn btn-link text-muted">Ver todos</a>
+        </div>
+
+        <div class="row py-3 px-4">
+          <div class="col-4 py-3" *ngFor="let item of Books">
+            <app-cards
+              [author]="item.author"
+              [title]="item.title"
+              [CiteBook]="item.description"
+              [UrlImg]="item.urlImg"
+            ></app-cards>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
