@@ -18,14 +18,14 @@ export class AppComponent {
 
   constructor(private userservice: UserService, private router: Router) {
     // this.login = this.readLocalStorageValue('ACCESS_TOKEN');
+    const Login = this.getUserLoggedIn();
+    if(Login){
+      this.userservice.setLoggedIn(true);
+    }
   }
 
-  readLocalStorageValue(key: string): string {
-    return localStorage.getItem(key);
+  getUserLoggedIn() {
+    return localStorage.getItem('USER_ID');
   }
 
-  logout() {
-    this.userservice.logout();
-    this.router.navigate(['signin']);
-  }
 }

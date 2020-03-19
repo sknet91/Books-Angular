@@ -44,11 +44,18 @@ export class UserService {
     }
   }
 
+  postFile(fileToUpload: File){
+    const endpoint = 'localhost:3001/pruebas';
+    const formData: FormData = new FormData();
+    formData.append('Image', fileToUpload, fileToUpload.name);
+    return this.http
+    .post(endpoint, formData);
+  }
+
   updateUser(user: IUserUpdate) {
     try {
       const idUser = localStorage.getItem('USER_ID');
       const response = this.http.put(`${this.SERVER_HOST}/user/${idUser}`, user);
-      // console.log(response);
       return response;
     } catch (error) {
       console.log(error);
@@ -56,7 +63,9 @@ export class UserService {
   }
 
   logout(){
-    localStorage.removeItem('access_token');
+    localStorage.removeItem('ACCESS_TOKEN');
+    localStorage.removeItem('USER_ID');
+    localStorage.removeItem('EXPIRES_IN');
     this.setLoggedIn(false);
   }
 
@@ -64,6 +73,16 @@ export class UserService {
     try {
       const idUser = localStorage.getItem('USER_ID');
       const response: any = this.http.get(`${this.SERVER_HOST}/user/${idUser}` );
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  getImage(): Observable <any> {
+    try {
+      const idUser = localStorage.getItem('USER_ID');
+      const response: any = this.http.get(`${this.SERVER_HOST}/getImage/${idUser}`, { responseType: 'blob' } );
       return response;
     } catch (error) {
       console.log(error);

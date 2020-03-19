@@ -1,6 +1,7 @@
 <!-- Default form register -->
 <div class="d-flex justify-content-center mx-5  py-5">
-<form [formGroup]="editProfile" (ngSubmit)="send()" class="text-center border border-light p-5" action="#!">
+<form [formGroup]="editProfile" (ngSubmit)="submitForm()" class="text-center border border-light p-5" action="#!" enctype="multipart/form-data">
+  <!-- (ngSubmit)="send()" -->
 
   <p class="h4 mb-4">Editar Perfil</p>
 
@@ -14,23 +15,52 @@
           <input type="text" formControlName="lastname" id="defaultRegisterFormLastName" class="form-control" placeholder="Apellidos">
       </div>
   </div>
+  <div *ngIf="editProfile.controls['name'].invalid && (editProfile.controls['name'].dirty || editProfile.controls['name'].touched)" class="alert alert-danger zoomIn animated delay-0s">
+    <div *ngIf="editProfile.controls['name'].errors.required">
+      name is required.
+    </div>
+  </div>
+  <div *ngIf="editProfile.controls['lastname'].invalid && (editProfile.controls['lastname'].dirty || editProfile.controls['lastname'].touched)" class="alert alert-danger zoomIn animated delay-0s">
+    <div *ngIf="editProfile.controls['lastname'].errors.required">
+      lastname is required.
+    </div>
+  </div>
 
-  <img src="{{profile_pic}}" class="h-15" width="20%">
+  <div class="text-center mb-4 mt-4" style="width: 422px;">
+    <div class="col">
+      <img src="{{profilePic}}" class="img-fluid img-thumbnail">
+    </div>
+  </div>
 
   <!-- (change)="onFileChange($event.target.files)" -->
 
   <div class="input-group mb-4 mt-4">
     <div class="custom-file">
-      <input type="file" class="custom-file-input" id="profile_pic"
-        aria-describedby="inputGroupFileAddon01" (change)="onFileChange($event.target.files)" >
-      <label class="custom-file-label" for="profile_pic">{{test}}</label>
+      <input type="file" class="custom-file-input" id="profile_pic" formControlName="profile_pic" (change)="onFileChange($event)" >
+      <label class="custom-file-label" for="profile_pic">{{msgUpload}}</label>
+    </div>
+  </div>
+
+  <div *ngIf="editProfile.controls['profile_pic'].invalid && (editProfile.controls['profile_pic'].dirty || editProfile.controls['profile_pic'].touched)" class="alert alert-danger zoomIn animated delay-0s">
+    <div *ngIf="editProfile.controls['profile_pic'].errors.required">
+      profile_pic is required.
     </div>
   </div>
 
   <!-- E-mail -->
   <input type="email" formControlName="user_email" id="defaultRegisterFormEmail" class="form-control mb-4" placeholder="E-mail">
+  <div *ngIf="editProfile.controls['user_email'].invalid && (editProfile.controls['user_email'].dirty || editProfile.controls['user_email'].touched)" class="alert alert-danger zoomIn animated delay-0s">
+    <div *ngIf="editProfile.controls['user_email'].errors.required">
+      user_email is required.
+    </div>
+  </div>
 
   <input type="text"  formControlName="city" id="defaultRegisterPhonePassword" class="form-control mb-4" placeholder="Ciudad">
+  <div *ngIf="editProfile.controls['city'].invalid && (editProfile.controls['city'].dirty || editProfile.controls['city'].touched)" class="alert alert-danger zoomIn animated delay-0s">
+    <div *ngIf="editProfile.controls['city'].errors.required">
+      city is required.
+    </div>
+  </div>
 
   <!-- Password -->
   <!-- <input type="password" id="defaultRegisterFormPassword" class="form-control" placeholder="Password" aria-describedby="defaultRegisterFormPasswordHelpBlock">
@@ -39,7 +69,7 @@
   </small> -->
 
   <!-- Sign up button -->
-  <button class="btn btn-info my-4 btn-block" type="submit">Actualizar</button>
+  <button class="btn btn-info my-4 btn-block" [disabled]="editProfile.pristine || editProfile.invalid" type="submit">Actualizar</button>
 
   <!-- Social register -->
 

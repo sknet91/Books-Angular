@@ -58,7 +58,8 @@ const routes: Routes = [
   {
     path: "editProfile",
     component: EditProfileComponent,
-    data: { title: "Iniciar sesion" }
+    data: { title: "Editar Perfil" },
+    canActivate: [AuthGuard]
   },
 
   { path: "", pathMatch: "full", redirectTo: "" },

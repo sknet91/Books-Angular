@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators, FormBuilder,  } from "@angular/forms";
+import { FormControl, FormGroup, Validators, FormBuilder } from "@angular/forms";
 import { UserService } from '../../data/user.service';
 import { NotifierService } from 'angular-notifier';
 import { environment } from './../../../environments/environment';
-import { Cloudinary } from '@cloudinary/angular-5.x';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-edit-profile',
@@ -12,90 +12,119 @@ import { Cloudinary } from '@cloudinary/angular-5.x';
 })
 export class EditProfileComponent implements OnInit {
 
-  private notifier: NotifierService;
-
   SERVER_HOST = environment.SERVER_HOST;
 
-  editProfile = new FormGroup({
-    name: new FormControl('', Validators.required),
-    lastname: new FormControl('', Validators.required),
-    city: new FormControl(''),
-    user_email: new FormControl('', [Validators.required, Validators.email])
-  });
+  emailDb: string;
+  nameDb: string;
+  lastnameDb: string;
+  cityDb: string;
+  profilePic: any;
+
+  editProfile: FormGroup;
+
+
+
+  form: FormGroup;
+
 
   data: any;
-
-  test = "prueba";
+  // test: any;
 
   // tslint:disable-next-line: variable-name
   profile_pic = "https://image.flaticon.com/icons/png/512/50/50050.png";
 
-  fileToUpload: File = null;
 
-  constructor(private userservice: UserService, notifier: NotifierService, public fb: FormBuilder, private cloudinary: Cloudinary) {
-    console.log(cloudinary.cloudinaryInstance.image('dog'));
-    this.send();
+  fileToUpload: File = null;
+  msgUpload = "Seleccionar Avatar";
+
+  constructor(private userservice: UserService, private notifier: NotifierService, public fb: FormBuilder, private router: Router) {
     this.notifier = notifier;
-    this.editProfile = this.fb.group({
+
+    this.editProfile = new FormGroup({
       name: new FormControl('', Validators.required),
       lastname: new FormControl('', Validators.required),
-      city: new FormControl(''),
+      city: new FormControl('', Validators.required),
       user_email: new FormControl('', [Validators.required, Validators.email]),
-      profile_pic: [null]
+      profile_pic: new FormControl('', Validators.required)
+    });
+
+    this.form = this.fb.group({
+      profile_pic: ['']
     })
   }
 
-  showPreview(event) {
-    const file = (event.target as HTMLInputElement).files[0];
-    this.editProfile.patchValue({
-      avatar: file
-    });
-    this.editProfile.get('avatar').updateValueAndValidity()
 
-    // File Preview
+  ngOnInit() {
+    this.userservice.getUsers().subscribe((user: any) => {
+      // console.log(user);
+      if (user) {
+
+        this.editProfile.controls.name.setValue(user.response.name);
+        this.editProfile.controls.lastname.setValue(user.response.lastname);
+        this.editProfile.controls.city.setValue(user.response.city);
+        this.editProfile.controls.user_email.setValue(user.response.user_email);
+
+        if (user.response.profile_pic) {
+          this.userservice.getImage().subscribe((data: any) => {
+            this.createImageFromBlob(data);
+          })
+        } else {
+          this.profilePic = "https://image.flaticon.com/icons/png/512/50/50050.png";
+        }
+      }
+    });
+  }
+
+  createImageFromBlob(image: Blob) {
     const reader = new FileReader();
-    reader.onload = () => {
-      this.profile_pic = reader.result as string;
+    reader.addEventListener("load", () => {
+      this.profilePic = reader.result;
+    }, false);
+    if (image) {
+      reader.readAsDataURL(image);
     }
-    reader.readAsDataURL(file)
+  }
+
+  onFileChange(files) {
+
+    const file = (files.target as HTMLInputElement).files[0];
+
+    this.fileToUpload = file;
+    this.msgUpload = this.fileToUpload.name;
+    this.form.patchValue({
+      profile_pic: file
+    });
+    this.form.get('profile_pic').updateValueAndValidity()
+
   }
 
   showNotification(type: string, message: string): void {
     this.notifier.notify(type, message);
   }
 
-  ngOnInit() {
-  }
-
-  send() {
+  submitForm() {
     this.data = this.editProfile;
-    console.log(this.data);
+
+    if (this.data.invalid) {
+      return;
+    }
 
 
+    const formData: any = new FormData();
+    formData.append("name", this.data.value.name);
+    formData.append("lastname", this.data.value.lastname);
+    formData.append("profile_pic", this.form.get('profile_pic').value);
+    formData.append("user_email", this.data.value.user_email);
+    formData.append("city", this.data.value.city);
 
-    // if (this.data.invalid) {
-    //   return;
-    // }
-
-    // this.userservice.updateUser(this.data.value).subscribe((res: any) => {
-    //   // console.log(res);
-
-    //   if (res.userId) {
-    //     this.showNotification('success', res.message);
-    //     this.data.reset();
-    //   } else {
-    //     this.showNotification('error', res.message);
-    //   }
-    // });
-  }
-
-
-  onFileChange(files: FileList) {
-
-    this.fileToUpload = files.item(0);
-    this.test = this.fileToUpload.name;
-
-
+    this.userservice.updateUser(formData).subscribe((res: any) => {
+      if (res.response.profile_pic) {
+        this.showNotification('success', res.message);
+        this.router.navigate(['/profile']);
+      } else {
+        this.showNotification('error', res.message);
+      }
+    });
   }
 
 }
